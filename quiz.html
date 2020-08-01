@@ -1,0 +1,87 @@
+<head>
+<link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,700|Roboto:400,700" rel="stylesheet">
+<link href='style.css' rel='stylesheet' type='text/css'>
+<title>SoilValues</title>
+<link rel="icon" type="x-icon" href="icon.png">
+<link rel="shortcut icon" type="x-icon" href="icon.png">
+<meta charset="utf-8">
+<script data-ad-client="ca-pub-8967875551184363" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+</head>
+<body>
+<script type="application/javascript"
+        src="questions.js">
+</script>
+<h1>SoilValues</h1>
+<hr>
+<h2 style="text-align:center;" id="question-number">Loading...</h2>
+<p class="question" id="question-text"></p>
+<button class="button" onclick="next_question( 1.0)" style="background-color: #1b5e20;">Strongly Agree</button> <br>
+<button class="button" onclick="next_question( 0.5)" style="background-color: #4caf50;">Agree</button> <br>
+<button class="button" onclick="next_question( 0.0)" style="background-color: #bbbbbb;">Neutral/Unsure</button> <br>
+<button class="button" onclick="next_question(-0.5)" style="background-color: #f44336;">Disagree</button> <br>
+<button class="button" onclick="next_question(-1.0)" style="background-color: #b71c1c;">Strongly Disagree</button> <br>
+<button class="small_button" onclick="prev_question()" id="back_button">Back</button>
+<button class="small_button_off" id="back_button_off">Back</button><br>
+
+<!-- JavaScript for the test itself -->
+<script>
+    var max_sand, max_silt, max_clay; // Max possible scores
+    max_sand = max_silt = max_clay = 0;
+    var sand, silt, clay; // User's scores
+    sand = silt = clay = 0;
+    var qn = 0; // Question number
+    var prev_answer = null;
+    init_question();
+    for (var i = 0; i < questions.length; i++) {
+        max_sand += Math.abs(questions[i].effect.sand)
+        max_silt += Math.abs(questions[i].effect.silt)
+        max_clay += Math.abs(questions[i].effect.clay)
+    }
+    function init_question() {
+        document.getElementById("question-text").innerHTML = questions[qn].question;
+        document.getElementById("question-number").innerHTML = "Question " + (qn + 1) + " of " + (questions.length);
+        if (prev_answer == null) {
+            document.getElementById("back_button").style.display = 'none';
+            document.getElementById("back_button_off").style.display = 'block';
+        } else {
+            document.getElementById("back_button").style.display = 'block';
+            document.getElementById("back_button_off").style.display = 'none';
+        }
+
+    }
+
+    function next_question(mult) {
+        sand += mult*questions[qn].effect.sand
+        silt += mult*questions[qn].effect.silt
+        clay += mult*questions[qn].effect.clay
+        qn++;
+        prev_answer = mult;
+        if (qn < questions.length) {
+            init_question();
+        } else {
+            results();
+        }
+    }
+    function prev_question() {
+        if (prev_answer == null) {
+            return;
+        }
+        qn--;
+        sand -= prev_answer * questions[qn].effect.sand;
+        silt -= prev_answer * questions[qn].effect.silt;
+        clay -= prev_answer * questions[qn].effect.clay;
+        prev_answer = null;
+        init_question();
+
+    }
+    function calc_score(score,max) {
+        return (100*(max+score)/(2*max)).toFixed(1)
+    }
+    function results() {
+        location.href = `results.html`
+            + `?n=${sand}`
+            + `&s=${silt}`
+            + `&c=${clay}`
+    }
+</script>
+</body>
